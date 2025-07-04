@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Phone, Mail, MapPin, Clock } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface ContactContent {
   phone: string;
@@ -20,12 +21,14 @@ interface ContactContent {
 export default function Contact() {
   const [content, setContent] = useState<ContactContent | null>(null);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
     message: ''
   });
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -55,12 +58,58 @@ export default function Contact() {
 
   const displayContent = content || defaultContent;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log('Contact form submitted:', formData);
-    // Reset form
-    setFormData({ name: '', email: '', phone: '', message: '' });
+    
+    // Validate form
+    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields (Name, Email, Message).",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email.trim())) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setSubmitting(true);
+    
+    try {
+      // Log the form submission (you can integrate with your email service here)
+      console.log('Contact form submitted:', formData);
+      
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Show success message
+      toast({
+        title: "Message Sent Successfully!",
+        description: "Thank you for contacting us. We'll get back to you within 24 hours."
+      });
+      
+      // Reset form
+      setFormData({ name: '', email: '', phone: '', message: '' });
+      
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast({
+        title: "Send Failed",
+        description: "There was an error sending your message. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -158,6 +207,7 @@ export default function Contact() {
                     id="name"
                     value={formData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
+                    placeholder="Enter your full name"
                     required
                   />
                 </div>
@@ -169,6 +219,7 @@ export default function Contact() {
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
+                    placeholder="Enter your email address"
                     required
                   />
                 </div>
@@ -180,6 +231,7 @@ export default function Contact() {
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => handleInputChange('phone', e.target.value)}
+                    placeholder="Enter your phone number"
                   />
                 </div>
 
@@ -195,8 +247,8 @@ export default function Contact() {
                   />
                 </div>
 
-                <Button type="submit" className="w-full">
-                  Send Message
+                <Button type="submit" className="w-full" disabled={submitting}>
+                  {submitting ? 'Sending...' : 'Send Message'}
                 </Button>
               </form>
             </CardContent>

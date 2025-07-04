@@ -63,21 +63,39 @@ export default function PatientPortal() {
       return;
     }
 
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(searchEmail.trim())) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setLoading(true);
     try {
-      const q = query(collection(db, 'appointments'), where('email', '==', searchEmail.trim()));
+      console.log('Searching appointments for email:', searchEmail.trim());
+      const q = query(collection(db, 'appointments'), where('email', '==', searchEmail.trim().toLowerCase()));
       const querySnapshot = await getDocs(q);
       const appointmentsData = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       })) as Appointment[];
       
+      console.log('Found appointments:', appointmentsData);
       setAppointments(appointmentsData);
       
       if (appointmentsData.length === 0) {
         toast({
           title: "No Appointments Found",
           description: "No appointments found for this email address."
+        });
+      } else {
+        toast({
+          title: "Appointments Found",
+          description: `Found ${appointmentsData.length} appointment(s) for your email.`
         });
       }
     } catch (error) {
@@ -138,6 +156,9 @@ export default function PatientPortal() {
                   onChange={(e) => setSearchEmail(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && searchAppointments()}
                 />
+                <p className="text-sm text-gray-500 mt-1">
+                  Enter the email address you used when booking your appointment
+                </p>
               </div>
               <div className="flex items-end">
                 <Button onClick={searchAppointments} disabled={loading}>
@@ -173,7 +194,12 @@ export default function PatientPortal() {
                   <CardContent className="space-y-3">
                     <div className="flex items-center text-sm text-gray-600">
                       <Calendar className="h-4 w-4 mr-2" />
-                      {new Date(appointment.date).toLocaleDateString()}
+                      {new Date(appointment.date).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
                     </div>
                     <div className="flex items-center text-sm text-gray-600">
                       <Clock className="h-4 w-4 mr-2" />
@@ -213,6 +239,9 @@ export default function PatientPortal() {
             <div className="bg-gray-100 rounded-lg p-12">
               <h2 className="text-2xl font-semibold text-gray-900 mb-2">No Appointments Found</h2>
               <p className="text-gray-600">No appointments found for the provided email address.</p>
+              <p className="text-sm text-gray-500 mt-2">
+                Make sure you entered the same email address used when booking your appointment.
+              </p>
             </div>
           </div>
         )}
