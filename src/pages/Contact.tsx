@@ -45,11 +45,12 @@ export default function Contact() {
     fetchContent();
   }, []);
 
-  const defaultContent = {
+  const defaultContent: ContactContent = {
     phone: '+1 (555) 123-4567',
     email: 'info@carelink.health',
     address: '123 Healthcare Avenue, Medical City, MC 12345',
-    hours: 'Monday - Friday: 8:00 AM - 6:00 PM\nSaturday: 9:00 AM - 4:00 PM\nSunday: Emergency Only'
+    hours: 'Monday - Friday: 8:00 AM - 6:00 PM\nSaturday: 9:00 AM - 4:00 PM\nSunday: Emergency Only',
+    chatWidget: ''
   };
 
   const displayContent = content || defaultContent;
@@ -203,7 +204,7 @@ export default function Contact() {
         </div>
 
         {/* Chat Widget Integration */}
-        {displayContent.chatWidget && (
+        {displayContent.chatWidget && displayContent.chatWidget.trim() !== '' && (
           <div className="mt-12">
             <Card>
               <CardHeader>
