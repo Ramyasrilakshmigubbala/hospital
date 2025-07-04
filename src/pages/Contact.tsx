@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { collection, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -108,7 +107,8 @@ export default function Contact() {
     phone: "+1 (555) 123-4567",
     email: "info@carelink.health",
     address: "123 Healthcare Avenue, Medical City, MC 12345",
-    hours: "Monday - Friday: 8:00 AM - 6:00 PM\nSaturday: 9:00 AM - 4:00 PM\nSunday: Emergency Only"
+    hours: "Monday - Friday: 8:00 AM - 6:00 PM\nSaturday: 9:00 AM - 4:00 PM\nSunday: Emergency Only",
+    chatWidget: ""
   };
 
   const displayContent = content || defaultContent;
