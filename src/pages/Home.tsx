@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -28,7 +27,12 @@ export default function Home() {
         const querySnapshot = await getDocs(collection(db, 'homeContent'));
         if (!querySnapshot.empty) {
           const doc = querySnapshot.docs[0];
-          setContent(doc.data() as HomeContent);
+          const data = doc.data() as HomeContent;
+          // Ensure features array exists
+          if (!data.features || !Array.isArray(data.features)) {
+            data.features = [];
+          }
+          setContent(data);
         }
       } catch (error) {
         console.error('Error fetching home content:', error);
@@ -69,21 +73,9 @@ export default function Home() {
   };
 
   const displayContent = content || defaultContent;
-
-  const getIcon = (iconName: string) => {
-    switch (iconName.toLowerCase()) {
-      case 'heart':
-        return <Heart className="h-8 w-8 text-blue-600" />;
-      case 'shield':
-        return <Shield className="h-8 w-8 text-blue-600" />;
-      case 'users':
-        return <Users className="h-8 w-8 text-blue-600" />;
-      case 'clock':
-        return <Clock className="h-8 w-8 text-blue-600" />;
-      default:
-        return <Heart className="h-8 w-8 text-blue-600" />;
-    }
-  };
+  
+  // Ensure features array is always available
+  const features = displayContent.features || defaultContent.features;
 
   if (loading) {
     return (
@@ -109,13 +101,13 @@ export default function Home() {
               {displayContent.description}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="bg-white text-blue-600 hover:bg-blue-50 shadow-lg hover:shadow-xl transition-all duration-300">
+              <Button asChild size="lg" className="bg-white text-blue-600 hover:bg-blue-50 shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-3">
                 <Link to="/appointments">
                   Book Appointment
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600 shadow-lg hover:shadow-xl transition-all duration-300">
+              <Button asChild size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-blue-600 shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-3">
                 <Link to="/services">
                   Our Services
                   <ArrowRight className="ml-2 h-5 w-5" />
@@ -139,7 +131,7 @@ export default function Home() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {displayContent.features.map((feature, index) => (
+            {features.map((feature, index) => (
               <Card key={index} className="text-center hover:shadow-lg transition-shadow duration-300 border-0 shadow-md">
                 <CardHeader>
                   <div className="flex justify-center mb-4">
@@ -202,3 +194,18 @@ export default function Home() {
     </div>
   );
 }
+
+const getIcon = (iconName: string) => {
+  switch (iconName.toLowerCase()) {
+    case 'heart':
+      return <Heart className="h-8 w-8 text-blue-600" />;
+    case 'shield':
+      return <Shield className="h-8 w-8 text-blue-600" />;
+    case 'users':
+      return <Users className="h-8 w-8 text-blue-600" />;
+    case 'clock':
+      return <Clock className="h-8 w-8 text-blue-600" />;
+    default:
+      return <Heart className="h-8 w-8 text-blue-600" />;
+  }
+};

@@ -4,12 +4,13 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LogOut, Home, Stethoscope, Users, Calendar, FileText } from 'lucide-react';
+import { LogOut, Home, Stethoscope, Users, Calendar, FileText, MessageSquare } from 'lucide-react';
 import HomeContentManager from '@/components/admin/HomeContentManager';
 import ServicesManager from '@/components/admin/ServicesManager';
 import DoctorsManager from '@/components/admin/DoctorsManager';
 import AppointmentsManager from '@/components/admin/AppointmentsManager';
 import HealthRecordsManager from '@/components/admin/HealthRecordsManager';
+import MessagesManager from '@/components/admin/MessagesManager';
 
 export default function AdminDashboard() {
   const { user, logout } = useAuth();
@@ -42,7 +43,7 @@ export default function AdminDashboard() {
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="home" className="flex items-center space-x-2">
               <Home className="h-4 w-4" />
               <span>Home</span>
@@ -62,6 +63,10 @@ export default function AdminDashboard() {
             <TabsTrigger value="records" className="flex items-center space-x-2">
               <FileText className="h-4 w-4" />
               <span>Records</span>
+            </TabsTrigger>
+            <TabsTrigger value="messages" className="flex items-center space-x-2">
+              <MessageSquare className="h-4 w-4" />
+              <span>Messages</span>
             </TabsTrigger>
           </TabsList>
 
@@ -116,6 +121,17 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent>
                 <HealthRecordsManager />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="messages">
+            <Card>
+              <CardHeader>
+                <CardTitle>Contact Messages</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <MessagesManager />
               </CardContent>
             </Card>
           </TabsContent>

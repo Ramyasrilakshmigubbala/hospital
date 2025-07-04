@@ -1,13 +1,13 @@
 
 import { useEffect, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Phone, Mail, MapPin, Clock } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { MapPin, Phone, Mail, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface ContactContent {
@@ -18,16 +18,23 @@ interface ContactContent {
   chatWidget?: string;
 }
 
+interface ContactForm {
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+}
+
 export default function Contact() {
   const [content, setContent] = useState<ContactContent | null>(null);
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ContactForm>({
     name: '',
     email: '',
     phone: '',
     message: ''
   });
+  const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -48,58 +55,43 @@ export default function Contact() {
     fetchContent();
   }, []);
 
-  const defaultContent: ContactContent = {
-    phone: '+1 (555) 123-4567',
-    email: 'info@carelink.health',
-    address: '123 Healthcare Avenue, Medical City, MC 12345',
-    hours: 'Monday - Friday: 8:00 AM - 6:00 PM\nSaturday: 9:00 AM - 4:00 PM\nSunday: Emergency Only',
-    chatWidget: ''
+  const handleInputChange = (field: keyof ContactForm, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
-
-  const displayContent = content || defaultContent;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate form
-    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
+    // Basic validation
+    if (!formData.name || !formData.email || !formData.message) {
       toast({
-        title: "Validation Error",
-        description: "Please fill in all required fields (Name, Email, Message).",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email.trim())) {
-      toast({
-        title: "Invalid Email",
-        description: "Please enter a valid email address.",
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
         variant: "destructive"
       });
       return;
     }
 
     setSubmitting(true);
-    
+
     try {
-      // Log the form submission (you can integrate with your email service here)
-      console.log('Contact form submitted:', formData);
-      
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Show success message
+      await addDoc(collection(db, 'contactMessages'), {
+        ...formData,
+        timestamp: serverTimestamp()
+      });
+
       toast({
         title: "Message Sent Successfully!",
-        description: "Thank you for contacting us. We'll get back to you within 24 hours."
+        description: "Thank you for contacting us. We'll get back to you soon."
       });
-      
+
       // Reset form
-      setFormData({ name: '', email: '', phone: '', message: '' });
-      
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        message: ''
+      });
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
@@ -112,9 +104,14 @@ export default function Contact() {
     }
   };
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const defaultContent = {
+    phone: "+1 (555) 123-4567",
+    email: "info@carelink.health",
+    address: "123 Healthcare Avenue, Medical City, MC 12345",
+    hours: "Monday - Friday: 8:00 AM - 6:00 PM\nSaturday: 9:00 AM - 4:00 PM\nSunday: Emergency Only"
   };
+
+  const displayContent = content || defaultContent;
 
   if (loading) {
     return (
@@ -130,7 +127,7 @@ export default function Contact() {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Contact Us</h1>
           <p className="text-lg text-gray-600">
-            Get in touch with our team. We're here to help with all your healthcare needs.
+            Get in touch with our healthcare team. We're here to help.
           </p>
         </div>
 
@@ -139,57 +136,49 @@ export default function Contact() {
           <div className="space-y-8">
             <Card>
               <CardHeader>
-                <CardTitle>Get in Touch</CardTitle>
+                <CardTitle className="flex items-center">
+                  <Phone className="mr-2 h-5 w-5 text-blue-600" />
+                  Phone
+                </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex items-start space-x-3">
-                  <Phone className="h-5 w-5 text-blue-600 mt-1" />
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Phone</h3>
-                    <p className="text-gray-600">{displayContent.phone}</p>
-                    <p className="text-sm text-gray-500">24/7 Emergency Line</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-3">
-                  <Mail className="h-5 w-5 text-blue-600 mt-1" />
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Email</h3>
-                    <p className="text-gray-600">{displayContent.email}</p>
-                    <p className="text-sm text-gray-500">We'll respond within 24 hours</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-3">
-                  <MapPin className="h-5 w-5 text-blue-600 mt-1" />
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Address</h3>
-                    <p className="text-gray-600">{displayContent.address}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-3">
-                  <Clock className="h-5 w-5 text-blue-600 mt-1" />
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Hours</h3>
-                    <div className="text-gray-600 whitespace-pre-line">
-                      {displayContent.hours}
-                    </div>
-                  </div>
-                </div>
+              <CardContent>
+                <p className="text-gray-600">{displayContent.phone}</p>
               </CardContent>
             </Card>
 
-            {/* Emergency Information */}
-            <Card className="bg-red-50 border-red-200">
+            <Card>
               <CardHeader>
-                <CardTitle className="text-red-800">Emergency Contact</CardTitle>
+                <CardTitle className="flex items-center">
+                  <Mail className="mr-2 h-5 w-5 text-green-600" />
+                  Email
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-red-700 mb-2">For medical emergencies, call 911 immediately.</p>
-                <p className="text-red-600 text-sm">
-                  For urgent but non-emergency medical concerns, call our 24/7 hotline: {displayContent.phone}
-                </p>
+                <p className="text-gray-600">{displayContent.email}</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <MapPin className="mr-2 h-5 w-5 text-red-600" />
+                  Address
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">{displayContent.address}</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Clock className="mr-2 h-5 w-5 text-purple-600" />
+                  Hours
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-gray-600 whitespace-pre-line">{displayContent.hours}</div>
               </CardContent>
             </Card>
           </div>
@@ -202,36 +191,36 @@ export default function Contact() {
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <Label htmlFor="name">Full Name *</Label>
+                  <Label htmlFor="name">Name *</Label>
                   <Input
                     id="name"
                     value={formData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
-                    placeholder="Enter your full name"
+                    placeholder="Your full name"
                     required
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="email">Email Address *</Label>
+                  <Label htmlFor="email">Email *</Label>
                   <Input
                     id="email"
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
-                    placeholder="Enter your email address"
+                    placeholder="your.email@example.com"
                     required
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="phone">Phone Number</Label>
+                  <Label htmlFor="phone">Phone</Label>
                   <Input
                     id="phone"
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => handleInputChange('phone', e.target.value)}
-                    placeholder="Enter your phone number"
+                    placeholder="(555) 123-4567"
                   />
                 </div>
 
@@ -241,13 +230,13 @@ export default function Contact() {
                     id="message"
                     value={formData.message}
                     onChange={(e) => handleInputChange('message', e.target.value)}
-                    rows={5}
                     placeholder="How can we help you?"
+                    rows={5}
                     required
                   />
                 </div>
 
-                <Button type="submit" className="w-full" disabled={submitting}>
+                <Button type="submit" disabled={submitting} className="w-full">
                   {submitting ? 'Sending...' : 'Send Message'}
                 </Button>
               </form>
@@ -255,17 +244,10 @@ export default function Contact() {
           </Card>
         </div>
 
-        {/* Chat Widget Integration */}
-        {displayContent.chatWidget && displayContent.chatWidget.trim() !== '' && (
+        {/* Chat Widget */}
+        {displayContent.chatWidget && (
           <div className="mt-12">
-            <Card>
-              <CardHeader>
-                <CardTitle>Live Chat Support</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div dangerouslySetInnerHTML={{ __html: displayContent.chatWidget }} />
-              </CardContent>
-            </Card>
+            <div dangerouslySetInnerHTML={{ __html: displayContent.chatWidget }} />
           </div>
         )}
       </div>
