@@ -5,7 +5,6 @@ import { db } from '@/lib/firebase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, MapPin, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface Doctor {
@@ -17,6 +16,7 @@ interface Doctor {
   availability?: string[];
   rating?: number;
   location?: string;
+  consultationFee?: number;
 }
 
 export default function Doctors() {
@@ -89,30 +89,8 @@ export default function Doctors() {
                   </div>
                   <CardTitle className="text-xl">Dr. {doctor.name}</CardTitle>
                   <Badge variant="secondary" className="w-fit mx-auto">{doctor.specialty}</Badge>
-                  {doctor.rating && (
-                    <div className="flex items-center justify-center mt-2">
-                      <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                      <span className="ml-1 text-sm text-gray-600">{doctor.rating}/5</span>
-                    </div>
-                  )}
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-gray-600 text-sm">{doctor.bio}</p>
-                  
-                  {doctor.location && (
-                    <div className="flex items-center text-sm text-gray-500">
-                      <MapPin className="h-4 w-4 mr-1" />
-                      {doctor.location}
-                    </div>
-                  )}
-                  
-                  {doctor.availability && doctor.availability.length > 0 && (
-                    <div className="flex items-center text-sm text-gray-500">
-                      <Calendar className="h-4 w-4 mr-1" />
-                      Available: {doctor.availability.join(', ')}
-                    </div>
-                  )}
-                  
+                <CardContent className="text-center space-y-4">
                   <Button asChild className="w-full">
                     <Link to={`/appointments?doctor=${doctor.id}`}>
                       Book Appointment

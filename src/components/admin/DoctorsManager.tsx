@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { collection, addDoc, updateDoc, doc, getDocs, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -19,6 +18,7 @@ interface Doctor {
   availability: string[];
   rating?: number;
   location?: string;
+  consultationFee?: number;
 }
 
 export default function DoctorsManager() {
@@ -31,7 +31,8 @@ export default function DoctorsManager() {
     image: '',
     availability: '',
     rating: '',
-    location: ''
+    location: '',
+    consultationFee: ''
   });
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -82,7 +83,8 @@ export default function DoctorsManager() {
         image: formData.image.trim() || '',
         availability: formData.availability ? formData.availability.split(',').map(day => day.trim()).filter(day => day) : [],
         rating: formData.rating ? parseFloat(formData.rating) : 0,
-        location: formData.location.trim() || ''
+        location: formData.location.trim() || '',
+        consultationFee: formData.consultationFee ? parseFloat(formData.consultationFee) : 0
       };
 
       console.log('Saving doctor data:', doctorData);
@@ -109,7 +111,8 @@ export default function DoctorsManager() {
         image: '', 
         availability: '', 
         rating: '', 
-        location: '' 
+        location: '',
+        consultationFee: ''
       });
       setEditingDoctor(null);
       await fetchDoctors();
@@ -135,7 +138,8 @@ export default function DoctorsManager() {
       image: doctor.image || '',
       availability: doctor.availability ? doctor.availability.join(', ') : '',
       rating: doctor.rating?.toString() || '',
-      location: doctor.location || ''
+      location: doctor.location || '',
+      consultationFee: doctor.consultationFee?.toString() || ''
     });
   };
 
@@ -175,7 +179,8 @@ export default function DoctorsManager() {
       image: '', 
       availability: '', 
       rating: '', 
-      location: '' 
+      location: '',
+      consultationFee: ''
     });
   };
 
@@ -209,6 +214,19 @@ export default function DoctorsManager() {
                   onChange={(e) => handleInputChange('specialty', e.target.value)}
                   placeholder="Cardiology"
                   required
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="consultationFee">Consultation Fee (₹)</Label>
+                <Input
+                  id="consultationFee"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={formData.consultationFee}
+                  onChange={(e) => handleInputChange('consultationFee', e.target.value)}
+                  placeholder="500"
                 />
               </div>
               
@@ -296,6 +314,11 @@ export default function DoctorsManager() {
             <CardContent>
               <p className="text-sm text-gray-600 mb-2">{doctor.specialty}</p>
               <p className="text-sm mb-2 line-clamp-3">{doctor.bio}</p>
+              {doctor.consultationFee && doctor.consultationFee > 0 && (
+                <p className="text-sm font-semibold text-green-600 mb-2">
+                  Fee: ₹{doctor.consultationFee}
+                </p>
+              )}
               {doctor.availability && doctor.availability.length > 0 && (
                 <p className="text-sm text-gray-600 mb-2">
                   Available: {doctor.availability.join(', ')}

@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { collection, addDoc, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -10,8 +9,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Modal } from '@/components/ui/modal';
 import { format } from 'date-fns';
-import { CalendarIcon, Clock } from 'lucide-react';
+import { CalendarIcon, Clock, CreditCard } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useSearchParams } from 'react-router-dom';
 
@@ -19,6 +19,7 @@ interface Doctor {
   id: string;
   name: string;
   specialty: string;
+  consultationFee?: number;
 }
 
 interface AppointmentData {
@@ -36,6 +37,8 @@ export default function Appointments() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [loading, setLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
   
@@ -57,6 +60,8 @@ export default function Appointments() {
     '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'
   ];
 
+  const selectedDoctor = doctors.find(doc => doc.id === formData.doctorId);
+
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
@@ -64,7 +69,8 @@ export default function Appointments() {
         const doctorsData = querySnapshot.docs.map(doc => ({
           id: doc.id,
           name: doc.data().name,
-          specialty: doc.data().specialty
+          specialty: doc.data().specialty,
+          consultationFee: doc.data().consultationFee || 0
         })) as Doctor[];
         setDoctors(doctorsData);
       } catch (error) {
@@ -79,29 +85,37 @@ export default function Appointments() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleBookAppointment = () => {
+    // Validate required fields
+    if (!formData.patientName || !formData.email || !formData.phone || 
+        !formData.doctorId || !selectedDate || !formData.time || !formData.reason) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Show payment modal if doctor has consultation fee
+    if (selectedDoctor?.consultationFee && selectedDoctor.consultationFee > 0) {
+      setShowPaymentModal(true);
+    } else {
+      proceedWithBooking();
+    }
+  };
+
+  const proceedWithBooking = async () => {
     setLoading(true);
+    setShowPaymentModal(false);
 
     try {
-      // Validate required fields
-      if (!formData.patientName || !formData.email || !formData.phone || 
-          !formData.doctorId || !selectedDate || !formData.time || !formData.reason) {
-        toast({
-          title: "Missing Information",
-          description: "Please fill in all required fields.",
-          variant: "destructive"
-        });
-        setLoading(false);
-        return;
-      }
-
       // Check for existing appointments at the same time
       const existingAppointments = await getDocs(
         query(
           collection(db, 'appointments'),
           where('doctorId', '==', formData.doctorId),
-          where('date', '==', selectedDate.toISOString().split('T')[0]),
+          where('date', '==', selectedDate!.toISOString().split('T')[0]),
           where('time', '==', formData.time)
         )
       );
@@ -118,17 +132,14 @@ export default function Appointments() {
 
       const appointmentData = {
         ...formData,
-        date: selectedDate.toISOString().split('T')[0],
+        date: selectedDate!.toISOString().split('T')[0],
         status: 'pending',
         createdAt: new Date().toISOString()
       };
 
       await addDoc(collection(db, 'appointments'), appointmentData);
 
-      toast({
-        title: "Appointment Booked!",
-        description: "Your appointment has been successfully scheduled. We'll send you a confirmation email shortly."
-      });
+      setShowSuccessModal(true);
 
       // Reset form
       setFormData({
@@ -173,7 +184,7 @@ export default function Appointments() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={(e) => { e.preventDefault(); handleBookAppointment(); }} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <Label htmlFor="patientName">Full Name *</Label>
@@ -304,6 +315,83 @@ export default function Appointments() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Payment Modal */}
+      <Modal isOpen={showPaymentModal} onClose={() => setShowPaymentModal(false)}>
+        <div className="text-center space-y-6">
+          <div className="flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mx-auto">
+            <CreditCard className="h-8 w-8 text-blue-600" />
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              Consultation Fee
+            </h3>
+            <p className="text-gray-600 mb-4">
+              Dr. {selectedDoctor?.name} - {selectedDoctor?.specialty}
+            </p>
+            <p className="text-3xl font-bold text-green-600 mb-6">
+              ₹{selectedDoctor?.consultationFee}
+            </p>
+          </div>
+          
+          <div className="space-y-3">
+            <h4 className="font-medium text-gray-900">Choose Payment Method:</h4>
+            <div className="grid grid-cols-1 gap-3">
+              <Button 
+                onClick={proceedWithBooking} 
+                disabled={loading}
+                className="w-full bg-purple-600 hover:bg-purple-700"
+              >
+                PhonePe
+              </Button>
+              <Button 
+                onClick={proceedWithBooking} 
+                disabled={loading}
+                className="w-full bg-green-600 hover:bg-green-700"
+              >
+                UPI
+              </Button>
+              <Button 
+                onClick={proceedWithBooking} 
+                disabled={loading}
+                className="w-full bg-blue-600 hover:bg-blue-700"
+              >
+                Net Banking
+              </Button>
+            </div>
+          </div>
+          
+          <Button 
+            variant="outline" 
+            onClick={() => setShowPaymentModal(false)}
+            className="w-full"
+          >
+            Cancel
+          </Button>
+        </div>
+      </Modal>
+
+      {/* Success Modal */}
+      <Modal isOpen={showSuccessModal} onClose={() => setShowSuccessModal(false)}>
+        <div className="text-center space-y-6">
+          <div className="flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mx-auto">
+            <svg className="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              Appointment Booked Successfully!
+            </h3>
+            <p className="text-gray-600">
+              Your appointment has been successfully scheduled. We'll send you a confirmation email shortly.
+            </p>
+          </div>
+          <Button onClick={() => setShowSuccessModal(false)} className="w-full">
+            Close
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 }
