@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Image } from 'lucide-react';
 
 interface Feature {
   title: string;
@@ -20,6 +20,7 @@ interface HomeContent {
   title: string;
   subtitle: string;
   description: string;
+  backgroundImage?: string;
   features: Feature[];
 }
 
@@ -28,6 +29,7 @@ export default function HomeContentManager() {
     title: '',
     subtitle: '',
     description: '',
+    backgroundImage: '',
     features: []
   });
   const [loading, setLoading] = useState(false);
@@ -43,6 +45,10 @@ export default function HomeContentManager() {
           // Ensure features array exists
           if (!data.features || !Array.isArray(data.features)) {
             data.features = [];
+          }
+          // Ensure backgroundImage exists
+          if (!data.backgroundImage) {
+            data.backgroundImage = '';
           }
           setContent(data);
         }
@@ -135,6 +141,22 @@ export default function HomeContentManager() {
             placeholder="Providing comprehensive medical care..."
             rows={3}
           />
+        </div>
+
+        <div>
+          <Label htmlFor="backgroundImage" className="flex items-center">
+            <Image className="mr-2 h-4 w-4" />
+            Background Image URL
+          </Label>
+          <Input
+            id="backgroundImage"
+            value={content.backgroundImage || ''}
+            onChange={(e) => handleInputChange('backgroundImage', e.target.value)}
+            placeholder="https://example.com/background-image.jpg"
+          />
+          <p className="text-sm text-gray-500 mt-1">
+            Enter a URL for the hero section background image (optional)
+          </p>
         </div>
       </div>
 

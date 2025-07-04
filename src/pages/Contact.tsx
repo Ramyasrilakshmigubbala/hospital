@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { collection, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -6,8 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin, Phone, Mail, Clock } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { MapPin, Phone, Mail, Clock, CheckCircle } from 'lucide-react';
+import { Modal } from '@/components/ui/modal';
 
 interface ContactContent {
   phone: string;
@@ -34,7 +35,7 @@ export default function Contact() {
     message: ''
   });
   const [submitting, setSubmitting] = useState(false);
-  const { toast } = useToast();
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -63,11 +64,6 @@ export default function Contact() {
     
     // Basic validation
     if (!formData.name || !formData.email || !formData.message) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields.",
-        variant: "destructive"
-      });
       return;
     }
 
@@ -79,10 +75,8 @@ export default function Contact() {
         timestamp: serverTimestamp()
       });
 
-      toast({
-        title: "Message Sent Successfully!",
-        description: "Thank you for contacting us. We'll get back to you soon."
-      });
+      // Show success modal
+      setShowSuccessModal(true);
 
       // Reset form
       setFormData({
@@ -93,11 +87,6 @@ export default function Contact() {
       });
     } catch (error) {
       console.error('Error sending message:', error);
-      toast({
-        title: "Send Failed",
-        description: "There was an error sending your message. Please try again.",
-        variant: "destructive"
-      });
     } finally {
       setSubmitting(false);
     }
@@ -251,6 +240,29 @@ export default function Contact() {
           </div>
         )}
       </div>
+
+      {/* Success Modal */}
+      <Modal 
+        isOpen={showSuccessModal} 
+        onClose={() => setShowSuccessModal(false)}
+        className="text-center"
+      >
+        <div className="flex flex-col items-center space-y-4">
+          <div className="bg-green-100 rounded-full p-4">
+            <CheckCircle className="h-12 w-12 text-green-600" />
+          </div>
+          <h3 className="text-xl font-semibold text-gray-900">Message Sent Successfully!</h3>
+          <p className="text-gray-600">
+            Thank you for contacting us. We'll get back to you soon.
+          </p>
+          <Button 
+            onClick={() => setShowSuccessModal(false)}
+            className="w-full mt-4"
+          >
+            Close
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 }
