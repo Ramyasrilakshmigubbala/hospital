@@ -134,6 +134,8 @@ export default function Appointments() {
         ...formData,
         date: selectedDate!.toISOString().split('T')[0],
         status: 'pending',
+        consultationFee: selectedDoctor?.consultationFee || 0,
+        paymentMethod: 'UPI',
         createdAt: new Date().toISOString()
       };
 
@@ -164,6 +166,21 @@ export default function Appointments() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePaymentMethodSelect = (method: string) => {
+    // Store the selected payment method and proceed
+    const appointmentDataWithPayment = {
+      ...formData,
+      date: selectedDate!.toISOString().split('T')[0],
+      status: 'confirmed',
+      consultationFee: selectedDoctor?.consultationFee || 0,
+      paymentMethod: method,
+      createdAt: new Date().toISOString()
+    };
+
+    // Simulate payment processing and then book appointment
+    proceedWithBooking();
   };
 
   return (
@@ -338,21 +355,21 @@ export default function Appointments() {
             <h4 className="font-medium text-gray-900">Choose Payment Method:</h4>
             <div className="grid grid-cols-1 gap-3">
               <Button 
-                onClick={proceedWithBooking} 
+                onClick={() => handlePaymentMethodSelect('PhonePe')} 
                 disabled={loading}
                 className="w-full bg-purple-600 hover:bg-purple-700"
               >
                 PhonePe
               </Button>
               <Button 
-                onClick={proceedWithBooking} 
+                onClick={() => handlePaymentMethodSelect('UPI')} 
                 disabled={loading}
                 className="w-full bg-green-600 hover:bg-green-700"
               >
                 UPI
               </Button>
               <Button 
-                onClick={proceedWithBooking} 
+                onClick={() => handlePaymentMethodSelect('Net Banking')} 
                 disabled={loading}
                 className="w-full bg-blue-600 hover:bg-blue-700"
               >

@@ -95,30 +95,30 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
-      {/* Clean Hero Section */}
+      {/* Clean Hero Section with Light Blue Theme */}
       <section 
-        className="bg-white text-gray-800 py-20 relative"
+        className="bg-gradient-to-br from-sky-50 to-blue-100 text-gray-800 py-20 relative"
         style={heroStyle}
       >
         <div className="max-w-6xl mx-auto px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-blue-600">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-blue-700">
               {displayContent.title}
             </h1>
-            <p className="text-xl md:text-2xl mb-6 text-gray-700">
+            <p className="text-xl md:text-2xl mb-6 text-blue-600">
               {displayContent.subtitle}
             </p>
-            <p className="text-lg mb-10 text-gray-600 max-w-3xl mx-auto">
+            <p className="text-lg mb-10 text-gray-700 max-w-3xl mx-auto">
               {displayContent.description}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3">
+              <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 shadow-lg">
                 <Link to="/appointments">
                   Book Appointment
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-50 px-8 py-3">
+              <Button asChild size="lg" variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-50 px-8 py-3 bg-white shadow-lg">
                 <Link to="/services">
                   Our Services
                 </Link>
@@ -129,10 +129,10 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl font-bold text-blue-800 mb-4">
               Why Choose Our Hospital?
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -142,14 +142,14 @@ export default function Home() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
-              <Card key={index} className="text-center hover:shadow-lg transition-shadow bg-white">
+              <Card key={index} className="text-center hover:shadow-xl transition-all duration-300 bg-gradient-to-b from-white to-sky-50 border-sky-200">
                 <CardHeader>
                   <div className="flex justify-center mb-4">
                     <div className="bg-blue-100 rounded-full p-3">
                       {getIcon(feature.icon)}
                     </div>
                   </div>
-                  <CardTitle className="text-lg font-semibold text-gray-900">{feature.title}</CardTitle>
+                  <CardTitle className="text-lg font-semibold text-blue-800">{feature.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600">{feature.description}</p>
@@ -161,43 +161,43 @@ export default function Home() {
       </section>
 
       {/* Quick Actions */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-gradient-to-b from-sky-50 to-white">
         <div className="max-w-6xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl font-bold text-blue-800 mb-4">
               Quick Access
             </h2>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="hover:shadow-lg transition-shadow">
+            <Card className="hover:shadow-xl transition-all duration-300 bg-white border-sky-200">
               <CardContent className="p-6 text-center">
                 <Heart className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Find a Doctor</h3>
+                <h3 className="text-xl font-semibold mb-2 text-blue-800">Find a Doctor</h3>
                 <p className="text-gray-600 mb-4">Browse our team of experienced specialists</p>
-                <Button asChild className="w-full">
+                <Button asChild className="w-full bg-blue-600 hover:bg-blue-700">
                   <Link to="/doctors">View Doctors</Link>
                 </Button>
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-lg transition-shadow">
+            <Card className="hover:shadow-xl transition-all duration-300 bg-white border-sky-200">
               <CardContent className="p-6 text-center">
                 <Users className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Health Records</h3>
+                <h3 className="text-xl font-semibold mb-2 text-blue-800">Health Records</h3>
                 <p className="text-gray-600 mb-4">Access your medical records securely</p>
-                <Button asChild className="w-full">
+                <Button asChild className="w-full bg-blue-600 hover:bg-blue-700">
                   <Link to="/health-records">View Records</Link>
                 </Button>
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-lg transition-shadow">
+            <Card className="hover:shadow-xl transition-all duration-300 bg-white border-sky-200">
               <CardContent className="p-6 text-center">
                 <Phone className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Contact Us</h3>
+                <h3 className="text-xl font-semibold mb-2 text-blue-800">Contact Us</h3>
                 <p className="text-gray-600 mb-4">Get in touch with our team</p>
-                <Button asChild className="w-full">
+                <Button asChild className="w-full bg-blue-600 hover:bg-blue-700">
                   <Link to="/contact">Contact</Link>
                 </Button>
               </CardContent>
