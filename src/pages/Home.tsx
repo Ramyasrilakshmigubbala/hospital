@@ -26,10 +26,12 @@ export default function Home() {
   useEffect(() => {
     const fetchContent = async () => {
       try {
+        console.log('Fetching home content...');
         const querySnapshot = await getDocs(collection(db, 'homeContent'));
         if (!querySnapshot.empty) {
           const doc = querySnapshot.docs[0];
           const data = doc.data() as HomeContent;
+          console.log('Home content fetched:', data);
           if (!data.features || !Array.isArray(data.features)) {
             data.features = [];
           }
@@ -85,31 +87,33 @@ export default function Home() {
     );
   }
 
-  const heroStyle = displayContent.backgroundImage 
-    ? {
-        backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), url(${displayContent.backgroundImage})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }
-    : {};
+  // Create proper background image styling
+  const heroStyle: React.CSSProperties = {};
+  if (displayContent.backgroundImage && displayContent.backgroundImage.trim()) {
+    console.log('Using background image:', displayContent.backgroundImage);
+    heroStyle.backgroundImage = `linear-gradient(rgba(135, 206, 235, 0.8), rgba(255, 255, 255, 0.9)), url("${displayContent.backgroundImage}")`;
+    heroStyle.backgroundSize = 'cover';
+    heroStyle.backgroundPosition = 'center';
+    heroStyle.backgroundRepeat = 'no-repeat';
+    heroStyle.backgroundAttachment = 'fixed';
+  }
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section with Light Blue Theme */}
+      {/* Hero Section with Light Blue Theme and Background Image */}
       <section 
         className="bg-gradient-to-br from-sky-50 to-blue-100 text-gray-800 py-20 relative min-h-[600px] flex items-center"
         style={heroStyle}
       >
         <div className="max-w-6xl mx-auto px-6 lg:px-8 w-full">
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-blue-700">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-blue-700 drop-shadow-md">
               {displayContent.title}
             </h1>
-            <p className="text-xl md:text-2xl mb-6 text-blue-600">
+            <p className="text-xl md:text-2xl mb-6 text-blue-600 drop-shadow-sm">
               {displayContent.subtitle}
             </p>
-            <p className="text-lg mb-10 text-gray-700 max-w-3xl mx-auto">
+            <p className="text-lg mb-10 text-gray-700 max-w-3xl mx-auto drop-shadow-sm bg-white/20 p-4 rounded-lg backdrop-blur-sm">
               {displayContent.description}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

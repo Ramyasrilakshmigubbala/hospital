@@ -5,6 +5,7 @@ import { db } from '@/lib/firebase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Link } from 'react-router-dom';
 import { MapPin, Star, Calendar } from 'lucide-react';
 
@@ -27,11 +28,13 @@ export default function Doctors() {
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
+        console.log('Fetching doctors...');
         const querySnapshot = await getDocs(collection(db, 'doctors'));
         const doctorsData = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         })) as Doctor[];
+        console.log('Doctors fetched:', doctorsData);
         setDoctors(doctorsData);
       } catch (error) {
         console.error('Error fetching doctors:', error);
@@ -73,29 +76,21 @@ export default function Doctors() {
             {doctors.map((doctor) => (
               <Card key={doctor.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader className="text-center">
-                  <div className="w-32 h-32 bg-gray-200 rounded-full mx-auto mb-4 overflow-hidden">
-                    {doctor.image ? (
-                      <img 
+                  <div className="flex justify-center mb-4">
+                    <Avatar className="w-32 h-32">
+                      <AvatarImage 
                         src={doctor.image} 
                         alt={doctor.name}
-                        className="w-full h-full object-cover"
                         onError={(e) => {
-                          console.log('Image failed to load:', doctor.image);
+                          console.log('Doctor image failed to load:', doctor.image);
                           const target = e.target as HTMLImageElement;
                           target.style.display = 'none';
-                          const fallback = target.nextElementSibling as HTMLElement;
-                          if (fallback) fallback.style.display = 'flex';
                         }}
                       />
-                    ) : null}
-                    <div 
-                      className="w-full h-full bg-blue-100 flex items-center justify-center"
-                      style={{ display: doctor.image ? 'none' : 'flex' }}
-                    >
-                      <span className="text-2xl font-bold text-blue-600">
+                      <AvatarFallback className="bg-blue-100 text-blue-600 text-2xl font-bold w-32 h-32">
                         {doctor.name.split(' ').map(n => n[0]).join('')}
-                      </span>
-                    </div>
+                      </AvatarFallback>
+                    </Avatar>
                   </div>
                   <CardTitle className="text-xl mb-2">Dr. {doctor.name}</CardTitle>
                   <Badge variant="secondary" className="w-fit mx-auto mb-2">{doctor.specialty}</Badge>
@@ -129,6 +124,13 @@ export default function Doctors() {
                         Availability
                       </h4>
                       <p className="text-sm text-gray-600">{doctor.availability.join(', ')}</p>
+                    </div>
+                  )}
+                  
+                  {doctor.consultationFee && doctor.consultationFee > 0 && (
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-1">Consultation Fee</h4>
+                      <p className="text-sm font-semibold text-green-600">₹{doctor.consultationFee}</p>
                     </div>
                   )}
                   
