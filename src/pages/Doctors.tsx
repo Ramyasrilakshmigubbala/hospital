@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { MapPin, Star, Calendar } from 'lucide-react';
 
 interface Doctor {
   id: string;
@@ -72,7 +73,7 @@ export default function Doctors() {
             {doctors.map((doctor) => (
               <Card key={doctor.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader className="text-center">
-                  <div className="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-4 overflow-hidden">
+                  <div className="w-32 h-32 bg-gray-200 rounded-full mx-auto mb-4 overflow-hidden">
                     {doctor.image ? (
                       <img 
                         src={doctor.image} 
@@ -87,10 +88,41 @@ export default function Doctors() {
                       </div>
                     )}
                   </div>
-                  <CardTitle className="text-xl">Dr. {doctor.name}</CardTitle>
-                  <Badge variant="secondary" className="w-fit mx-auto">{doctor.specialty}</Badge>
+                  <CardTitle className="text-xl mb-2">Dr. {doctor.name}</CardTitle>
+                  <Badge variant="secondary" className="w-fit mx-auto mb-2">{doctor.specialty}</Badge>
+                  
+                  {doctor.rating && doctor.rating > 0 && (
+                    <div className="flex items-center justify-center mb-2">
+                      <Star className="h-4 w-4 text-yellow-500 mr-1" />
+                      <span className="text-sm font-medium">{doctor.rating}/5</span>
+                    </div>
+                  )}
+                  
+                  {doctor.location && (
+                    <div className="flex items-center justify-center text-sm text-gray-600 mb-2">
+                      <MapPin className="h-4 w-4 mr-1" />
+                      {doctor.location}
+                    </div>
+                  )}
                 </CardHeader>
-                <CardContent className="text-center space-y-4">
+                <CardContent className="space-y-4">
+                  {doctor.bio && (
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-1">Biography</h4>
+                      <p className="text-sm text-gray-600 line-clamp-3">{doctor.bio}</p>
+                    </div>
+                  )}
+                  
+                  {doctor.availability && doctor.availability.length > 0 && (
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-1 flex items-center">
+                        <Calendar className="h-4 w-4 mr-1" />
+                        Availability
+                      </h4>
+                      <p className="text-sm text-gray-600">{doctor.availability.join(', ')}</p>
+                    </div>
+                  )}
+                  
                   <Button asChild className="w-full">
                     <Link to={`/appointments?doctor=${doctor.id}`}>
                       Book Appointment

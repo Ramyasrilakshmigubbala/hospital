@@ -1,13 +1,13 @@
 
 import { useState, useEffect } from 'react';
-import { collection, getDocs, updateDoc, doc, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, updateDoc, doc, query, orderBy, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Calendar, Clock, User, Phone, Mail } from 'lucide-react';
+import { Calendar, Clock, User, Phone, Mail, RefreshCw, Trash2 } from 'lucide-react';
 
 interface Appointment {
   id: string;
@@ -33,6 +33,7 @@ export default function AppointmentsManager() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [doctors, setDoctors] = useState<Record<string, Doctor>>({});
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -65,7 +66,17 @@ export default function AppointmentsManager() {
       console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
+  };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchData();
+    toast({
+      title: "Refreshed",
+      description: "Appointments data has been refreshed."
+    });
   };
 
   const updateAppointmentStatus = async (appointmentId: string, newStatus: string) => {
@@ -85,6 +96,28 @@ export default function AppointmentsManager() {
       toast({
         title: "Update Failed",
         description: "There was an error updating the appointment status.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const deleteAppointment = async (appointmentId: string) => {
+    if (!confirm('Are you sure you want to delete this appointment?')) {
+      return;
+    }
+
+    try {
+      await deleteDoc(doc(db, 'appointments', appointmentId));
+      setAppointments(prev => prev.filter(apt => apt.id !== appointmentId));
+      toast({
+        title: "Appointment Deleted",
+        description: "The appointment has been successfully deleted."
+      });
+    } catch (error) {
+      console.error('Error deleting appointment:', error);
+      toast({
+        title: "Delete Failed",
+        description: "There was an error deleting the appointment.",
         variant: "destructive"
       });
     }
@@ -117,6 +150,15 @@ export default function AppointmentsManager() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">All Appointments ({appointments.length})</h3>
+        <Button 
+          onClick={handleRefresh} 
+          disabled={refreshing}
+          variant="outline"
+          size="sm"
+        >
+          <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+          Refresh
+        </Button>
       </div>
 
       {appointments.length === 0 ? (
@@ -135,9 +177,18 @@ export default function AppointmentsManager() {
                       : 'Doctor Information'
                     }
                   </CardTitle>
-                  <Badge className={getStatusColor(appointment.status)}>
-                    {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge className={getStatusColor(appointment.status)}>
+                      {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
+                    </Badge>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => deleteAppointment(appointment.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
                 {doctors[appointment.doctorId] && (
                   <p className="text-sm text-gray-600">{doctors[appointment.doctorId].specialty}</p>
