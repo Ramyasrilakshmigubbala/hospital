@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -45,7 +46,7 @@ export default function Home() {
   }, []);
 
   const defaultContent: HomeContent = {
-    title: "Excellence in Healthcare",
+    title: "RoyalCare Hospital",
     subtitle: "Your Health, Our Priority",
     description: "Providing comprehensive medical care with compassion, expertise, and cutting-edge technology to ensure the best possible outcomes for our patients.",
     backgroundImage: "",
@@ -86,7 +87,7 @@ export default function Home() {
 
   const heroStyle = displayContent.backgroundImage 
     ? {
-        backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url(${displayContent.backgroundImage})`,
+        backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), url(${displayContent.backgroundImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
@@ -95,12 +96,12 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
-      {/* Clean Hero Section with Light Blue Theme */}
+      {/* Hero Section with Light Blue Theme */}
       <section 
-        className="bg-gradient-to-br from-sky-50 to-blue-100 text-gray-800 py-20 relative"
+        className="bg-gradient-to-br from-sky-50 to-blue-100 text-gray-800 py-20 relative min-h-[600px] flex items-center"
         style={heroStyle}
       >
-        <div className="max-w-6xl mx-auto px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto px-6 lg:px-8 w-full">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 text-blue-700">
               {displayContent.title}
@@ -133,7 +134,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-blue-800 mb-4">
-              Why Choose Our Hospital?
+              Why Choose RoyalCare Hospital?
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               We are committed to providing exceptional healthcare services with a patient-centered approach.
@@ -218,7 +219,7 @@ export default function Home() {
             <div>
               <Mail className="h-8 w-8 mx-auto mb-2" />
               <h3 className="font-semibold mb-1">Email</h3>
-              <p>info@hospital.com</p>
+              <p>info@royalcarehospital.com</p>
             </div>
             <div>
               <MapPin className="h-8 w-8 mx-auto mb-2" />

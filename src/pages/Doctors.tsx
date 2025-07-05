@@ -57,7 +57,7 @@ export default function Doctors() {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Our Doctors</h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Meet our team of experienced healthcare professionals dedicated to providing you with the best medical care.
+            Meet our team of experienced healthcare professionals at RoyalCare Hospital dedicated to providing you with the best medical care.
           </p>
         </div>
 
@@ -79,14 +79,23 @@ export default function Doctors() {
                         src={doctor.image} 
                         alt={doctor.name}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          console.log('Image failed to load:', doctor.image);
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          const fallback = target.nextElementSibling as HTMLElement;
+                          if (fallback) fallback.style.display = 'flex';
+                        }}
                       />
-                    ) : (
-                      <div className="w-full h-full bg-blue-100 flex items-center justify-center">
-                        <span className="text-2xl font-bold text-blue-600">
-                          {doctor.name.split(' ').map(n => n[0]).join('')}
-                        </span>
-                      </div>
-                    )}
+                    ) : null}
+                    <div 
+                      className="w-full h-full bg-blue-100 flex items-center justify-center"
+                      style={{ display: doctor.image ? 'none' : 'flex' }}
+                    >
+                      <span className="text-2xl font-bold text-blue-600">
+                        {doctor.name.split(' ').map(n => n[0]).join('')}
+                      </span>
+                    </div>
                   </div>
                   <CardTitle className="text-xl mb-2">Dr. {doctor.name}</CardTitle>
                   <Badge variant="secondary" className="w-fit mx-auto mb-2">{doctor.specialty}</Badge>

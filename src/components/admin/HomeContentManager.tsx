@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { collection, doc, setDoc, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -51,6 +50,15 @@ export default function HomeContentManager() {
             data.backgroundImage = '';
           }
           setContent(data);
+        } else {
+          // Set default content for RoyalCare Hospital
+          setContent({
+            title: 'RoyalCare Hospital',
+            subtitle: 'Your Health, Our Priority',
+            description: 'Providing comprehensive medical care with compassion, expertise, and cutting-edge technology to ensure the best possible outcomes for our patients.',
+            backgroundImage: '',
+            features: []
+          });
         }
       } catch (error) {
         console.error('Error fetching home content:', error);
@@ -118,7 +126,7 @@ export default function HomeContentManager() {
             id="title"
             value={content.title}
             onChange={(e) => handleInputChange('title', e.target.value)}
-            placeholder="Excellence in Healthcare"
+            placeholder="RoyalCare Hospital"
           />
         </div>
 
@@ -155,8 +163,13 @@ export default function HomeContentManager() {
             placeholder="https://example.com/background-image.jpg"
           />
           <p className="text-sm text-gray-500 mt-1">
-            Enter a URL for the hero section background image (optional)
+            Enter a full URL for the hero section background image (optional). Make sure the image URL is accessible and properly formatted.
           </p>
+          {content.backgroundImage && (
+            <div className="mt-2">
+              <p className="text-xs text-blue-600">Preview URL: {content.backgroundImage}</p>
+            </div>
+          )}
         </div>
       </div>
 
