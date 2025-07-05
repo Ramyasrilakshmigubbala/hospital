@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { collection, doc, setDoc, getDocs, addDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -20,6 +19,7 @@ interface HealthRecord {
   patientName: string;
   recordType: string;
   description: string;
+  email: string;
   dateCreated: any;
 }
 
@@ -34,7 +34,8 @@ export default function HealthRecordsManager() {
   const [newRecord, setNewRecord] = useState({
     patientName: '',
     recordType: '',
-    description: ''
+    description: '',
+    email: ''
   });
   const [editingRecord, setEditingRecord] = useState<HealthRecord | null>(null);
   const { toast } = useToast();
@@ -97,10 +98,10 @@ export default function HealthRecordsManager() {
   };
 
   const addRecord = async () => {
-    if (!newRecord.patientName || !newRecord.recordType) {
+    if (!newRecord.patientName || !newRecord.recordType || !newRecord.email) {
       toast({
         title: "Missing Information",
-        description: "Please fill in all required fields.",
+        description: "Please fill in all required fields including email.",
         variant: "destructive"
       });
       return;
@@ -112,7 +113,7 @@ export default function HealthRecordsManager() {
         dateCreated: new Date()
       });
       
-      setNewRecord({ patientName: '', recordType: '', description: '' });
+      setNewRecord({ patientName: '', recordType: '', description: '', email: '' });
       setShowAddRecord(false);
       fetchRecords();
       
@@ -138,6 +139,7 @@ export default function HealthRecordsManager() {
         patientName: editingRecord.patientName,
         recordType: editingRecord.recordType,
         description: editingRecord.description,
+        email: editingRecord.email,
         dateCreated: editingRecord.dateCreated
       });
       
@@ -255,6 +257,15 @@ export default function HealthRecordsManager() {
                   />
                 </div>
                 <div>
+                  <Label>Patient Email *</Label>
+                  <Input
+                    type="email"
+                    value={newRecord.email}
+                    onChange={(e) => setNewRecord(prev => ({ ...prev, email: e.target.value }))}
+                    placeholder="patient@example.com"
+                  />
+                </div>
+                <div>
                   <Label>Record Type *</Label>
                   <Input
                     value={newRecord.recordType}
@@ -291,6 +302,7 @@ export default function HealthRecordsManager() {
                 <thead>
                   <tr className="bg-gray-50">
                     <th className="border border-gray-300 px-4 py-2 text-left">Patient Name</th>
+                    <th className="border border-gray-300 px-4 py-2 text-left">Email</th>
                     <th className="border border-gray-300 px-4 py-2 text-left">Record Type</th>
                     <th className="border border-gray-300 px-4 py-2 text-left">Description</th>
                     <th className="border border-gray-300 px-4 py-2 text-left">Date Created</th>
@@ -308,6 +320,17 @@ export default function HealthRecordsManager() {
                           />
                         ) : (
                           record.patientName
+                        )}
+                      </td>
+                      <td className="border border-gray-300 px-4 py-2">
+                        {editingRecord?.id === record.id ? (
+                          <Input
+                            type="email"
+                            value={editingRecord.email}
+                            onChange={(e) => setEditingRecord(prev => prev ? { ...prev, email: e.target.value } : null)}
+                          />
+                        ) : (
+                          record.email
                         )}
                       </td>
                       <td className="border border-gray-300 px-4 py-2">

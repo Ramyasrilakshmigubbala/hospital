@@ -1,10 +1,9 @@
-
 import { useEffect, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight, Heart, Shield, Users, Clock, Star, Award, CheckCircle } from 'lucide-react';
+import { ArrowRight, Heart, Shield, Users, Clock, Phone, Mail, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface HomeContent {
@@ -30,7 +29,6 @@ export default function Home() {
         if (!querySnapshot.empty) {
           const doc = querySnapshot.docs[0];
           const data = doc.data() as HomeContent;
-          // Ensure features array exists
           if (!data.features || !Array.isArray(data.features)) {
             data.features = [];
           }
@@ -76,8 +74,6 @@ export default function Home() {
   };
 
   const displayContent = content || defaultContent;
-  
-  // Ensure features array is always available
   const features = displayContent.features || defaultContent.features;
 
   if (loading) {
@@ -90,7 +86,7 @@ export default function Home() {
 
   const heroStyle = displayContent.backgroundImage 
     ? {
-        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${displayContent.backgroundImage})`,
+        backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url(${displayContent.backgroundImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
@@ -99,79 +95,64 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
-      {/* Enhanced Hero Section */}
+      {/* Clean Hero Section */}
       <section 
-        className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white py-24 relative overflow-hidden"
+        className="bg-white text-gray-800 py-20 relative"
         style={heroStyle}
       >
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+        <div className="max-w-6xl mx-auto px-6 lg:px-8">
           <div className="text-center">
-            <div className="flex justify-center mb-6">
-              <div className="bg-white/10 backdrop-blur-sm rounded-full p-3">
-                <Star className="h-8 w-8 text-yellow-400" />
-              </div>
-            </div>
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-blue-600">
               {displayContent.title}
             </h1>
-            <p className="text-xl md:text-3xl mb-4 text-blue-100 font-medium">
+            <p className="text-xl md:text-2xl mb-6 text-gray-700">
               {displayContent.subtitle}
             </p>
-            <p className="text-lg mb-10 text-blue-200 max-w-4xl mx-auto leading-relaxed">
+            <p className="text-lg mb-10 text-gray-600 max-w-3xl mx-auto">
               {displayContent.description}
             </p>
-            <div className="flex flex-col sm:flex-row gap-6 justify-center">
-              <Button asChild size="lg" className="bg-white text-blue-600 hover:bg-blue-50 shadow-2xl hover:shadow-3xl transition-all duration-300 px-10 py-4 text-lg font-semibold rounded-full">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3">
                 <Link to="/appointments">
                   Book Appointment
-                  <ArrowRight className="ml-3 h-6 w-6" />
+                  <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-blue-600 shadow-2xl hover:shadow-3xl transition-all duration-300 px-10 py-4 text-lg font-semibold rounded-full backdrop-blur-sm">
+              <Button asChild size="lg" variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-50 px-8 py-3">
                 <Link to="/services">
                   Our Services
-                  <ArrowRight className="ml-3 h-6 w-6" />
                 </Link>
               </Button>
             </div>
           </div>
         </div>
-        {/* Decorative elements */}
-        <div className="absolute top-20 left-10 w-20 h-20 bg-white/10 rounded-full blur-xl"></div>
-        <div className="absolute bottom-20 right-10 w-32 h-32 bg-blue-300/20 rounded-full blur-2xl"></div>
       </section>
 
-      {/* Enhanced Features Section */}
-      <section className="py-24 bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-20">
-            <div className="flex justify-center mb-6">
-              <div className="bg-blue-100 rounded-full p-3">
-                <Award className="h-8 w-8 text-blue-600" />
-              </div>
-            </div>
-            <h2 className="text-5xl font-bold text-gray-900 mb-6">
+      {/* Features Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
               Why Choose Our Hospital?
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              We are committed to providing exceptional healthcare services with a patient-centered approach and cutting-edge medical technology.
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              We are committed to providing exceptional healthcare services with a patient-centered approach.
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
-              <Card key={index} className="text-center hover:shadow-2xl transition-all duration-300 border-0 shadow-lg group hover:-translate-y-2 bg-white/80 backdrop-blur-sm">
-                <CardHeader className="pb-4">
-                  <div className="flex justify-center mb-6">
-                    <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                      {getIcon(feature.icon, true)}
+              <Card key={index} className="text-center hover:shadow-lg transition-shadow bg-white">
+                <CardHeader>
+                  <div className="flex justify-center mb-4">
+                    <div className="bg-blue-100 rounded-full p-3">
+                      {getIcon(feature.icon)}
                     </div>
                   </div>
-                  <CardTitle className="text-xl font-bold text-gray-900">{feature.title}</CardTitle>
+                  <CardTitle className="text-lg font-semibold text-gray-900">{feature.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+                  <p className="text-gray-600">{feature.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -179,75 +160,98 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Enhanced Call to Action Section */}
-      <section className="bg-gradient-to-r from-blue-600 via-blue-700 to-purple-700 text-white py-20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-black/10"></div>
-        <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center relative z-10">
-          <div className="flex justify-center mb-8">
-            <div className="bg-white/20 backdrop-blur-sm rounded-full p-4">
-              <CheckCircle className="h-10 w-10 text-white" />
-            </div>
+      {/* Quick Actions */}
+      <section className="py-16 bg-white">
+        <div className="max-w-6xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Quick Access
+            </h2>
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Ready to Take Care of Your Health?
-          </h2>
-          <p className="text-xl mb-10 text-blue-100 leading-relaxed">
-            Schedule an appointment with our experienced medical professionals today and take the first step towards better health.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <Button asChild size="lg" className="bg-white text-blue-600 hover:bg-blue-50 shadow-2xl hover:shadow-3xl transition-all duration-300 px-10 py-4 text-lg font-semibold rounded-full">
-              <Link to="/appointments">
-                Schedule Appointment
-                <ArrowRight className="ml-3 h-6 w-6" />
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-blue-600 shadow-2xl hover:shadow-3xl transition-all duration-300 px-10 py-4 text-lg font-semibold rounded-full backdrop-blur-sm">
-              <Link to="/doctors">
-                Meet Our Doctors
-                <ArrowRight className="ml-3 h-6 w-6" />
-              </Link>
-            </Button>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-6 text-center">
+                <Heart className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Find a Doctor</h3>
+                <p className="text-gray-600 mb-4">Browse our team of experienced specialists</p>
+                <Button asChild className="w-full">
+                  <Link to="/doctors">View Doctors</Link>
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-6 text-center">
+                <Users className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Health Records</h3>
+                <p className="text-gray-600 mb-4">Access your medical records securely</p>
+                <Button asChild className="w-full">
+                  <Link to="/health-records">View Records</Link>
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-6 text-center">
+                <Phone className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Contact Us</h3>
+                <p className="text-gray-600 mb-4">Get in touch with our team</p>
+                <Button asChild className="w-full">
+                  <Link to="/contact">Contact</Link>
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
-        {/* Decorative elements */}
-        <div className="absolute top-10 left-0 w-40 h-40 bg-purple-400/20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-10 right-0 w-60 h-60 bg-blue-400/20 rounded-full blur-3xl"></div>
       </section>
 
-      {/* Enhanced Emergency Contact Section */}
-      <section className="bg-gradient-to-r from-red-600 to-red-700 text-white py-16 relative">
-        <div className="absolute inset-0 bg-black/10"></div>
-        <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center relative z-10">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Medical Emergency?
-          </h2>
-          <p className="text-xl mb-8 leading-relaxed">
-            For life-threatening emergencies, call 911 immediately. For urgent medical concerns, contact our 24/7 hotline.
-          </p>
-          <Button asChild size="lg" className="bg-white text-red-600 hover:bg-red-50 shadow-2xl hover:shadow-3xl transition-all duration-300 px-10 py-4 text-lg font-semibold rounded-full">
-            <Link to="/contact">
-              Emergency Contact
-              <ArrowRight className="ml-3 h-6 w-6" />
-            </Link>
-          </Button>
+      {/* Contact Info */}
+      <section className="py-12 bg-blue-600 text-white">
+        <div className="max-w-6xl mx-auto px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div>
+              <Phone className="h-8 w-8 mx-auto mb-2" />
+              <h3 className="font-semibold mb-1">Call Us</h3>
+              <p>(555) 123-4567</p>
+            </div>
+            <div>
+              <Mail className="h-8 w-8 mx-auto mb-2" />
+              <h3 className="font-semibold mb-1">Email</h3>
+              <p>info@hospital.com</p>
+            </div>
+            <div>
+              <MapPin className="h-8 w-8 mx-auto mb-2" />
+              <h3 className="font-semibold mb-1">Visit Us</h3>
+              <p>123 Health Street, Medical City</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Emergency Notice */}
+      <section className="bg-red-600 text-white py-8">
+        <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
+          <h2 className="text-2xl font-bold mb-2">Medical Emergency?</h2>
+          <p className="text-lg mb-4">Call 911 immediately for life-threatening emergencies</p>
+          <p className="text-sm">For urgent medical concerns, contact our 24/7 hotline: (555) 123-4567</p>
         </div>
       </section>
     </div>
   );
 }
 
-const getIcon = (iconName: string, isWhite = false) => {
-  const colorClass = isWhite ? "text-white" : "text-blue-600";
+const getIcon = (iconName: string) => {
   switch (iconName.toLowerCase()) {
     case 'heart':
-      return <Heart className={`h-8 w-8 ${colorClass}`} />;
+      return <Heart className="h-6 w-6 text-blue-600" />;
     case 'shield':
-      return <Shield className={`h-8 w-8 ${colorClass}`} />;
+      return <Shield className="h-6 w-6 text-blue-600" />;
     case 'users':
-      return <Users className={`h-8 w-8 ${colorClass}`} />;
+      return <Users className="h-6 w-6 text-blue-600" />;
     case 'clock':
-      return <Clock className={`h-8 w-8 ${colorClass}`} />;
+      return <Clock className="h-6 w-6 text-blue-600" />;
     default:
-      return <Heart className={`h-8 w-8 ${colorClass}`} />;
+      return <Heart className="h-6 w-6 text-blue-600" />;
   }
 };
