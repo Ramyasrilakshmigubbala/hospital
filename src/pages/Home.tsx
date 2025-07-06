@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -47,7 +48,7 @@ export default function Home() {
   }, []);
 
   const defaultContent: HomeContent = {
-    title: "RoyalCare Hospital",
+    title: "CareLink Health Hospital",
     subtitle: "Your Health, Our Priority",
     description: "Providing comprehensive medical care with compassion, expertise, and cutting-edge technology to ensure the best possible outcomes for our patients.",
     backgroundImage: "",
@@ -102,7 +103,15 @@ export default function Home() {
       {/* Hero Section with Light Blue Theme and Background Image */}
       <section 
         className="bg-gradient-to-br from-sky-50 to-blue-100 text-gray-800 py-20 relative min-h-[600px] flex items-center"
-        style={heroStyle}
+        style={{
+          ...(displayContent.backgroundImage && displayContent.backgroundImage.trim() && {
+            backgroundImage: `linear-gradient(rgba(135, 206, 235, 0.8), rgba(255, 255, 255, 0.9)), url("${displayContent.backgroundImage}")`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            backgroundAttachment: 'fixed'
+          })
+        }}
       >
         <div className="max-w-6xl mx-auto px-6 lg:px-8 w-full">
           <div className="text-center">
@@ -222,7 +231,7 @@ export default function Home() {
             <div>
               <Mail className="h-8 w-8 mx-auto mb-2" />
               <h3 className="font-semibold mb-1">Email</h3>
-              <p>info@royalcarehospital.com</p>
+              <p>info@carelinkhealthhospital.com</p>
             </div>
             <div>
               <MapPin className="h-8 w-8 mx-auto mb-2" />

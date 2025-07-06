@@ -60,7 +60,7 @@ export default function Doctors() {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Our Doctors</h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Meet our team of experienced healthcare professionals at RoyalCare Hospital dedicated to providing you with the best medical care.
+            Meet our team of experienced healthcare professionals at CareLink Health Hospital dedicated to providing you with the best medical care.
           </p>
         </div>
 
