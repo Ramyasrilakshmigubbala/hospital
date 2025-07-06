@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -138,7 +137,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-blue-800 mb-4">
-              Why Choose RoyalCare Hospital?
+              Why Choose CareLink Health Hospital?
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               We are committed to providing exceptional healthcare services with a patient-centered approach.
