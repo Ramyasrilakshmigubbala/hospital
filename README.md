@@ -1,4 +1,6 @@
-# Welcome to CareLink Health Portal
+# CareLink Health Portal
+
+A comprehensive healthcare management system developed by Ramya sri lakshmi Gubbala from Dream Team Services.
 
 ## How to Get Started
 
@@ -36,6 +38,11 @@ npm run dev
 - Select "Codespaces" tab
 - Click "New codespace"
 - Edit and commit changes within the environment
+
+## Author
+
+**Ramya sri lakshmi Gubbala**  
+Dream Team Services
 
 ## Technologies Used
 
